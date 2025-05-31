@@ -1,12 +1,12 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model User {
   id                String   @id @default(cuid())
   email             String   @unique
@@ -22,7 +22,6 @@ model User {
   reputation        Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-
   // Relations
   ideas             Idea[]
   comments          Comment[]
@@ -34,22 +33,17 @@ model User {
   reports           Report[]
   bookmarks         Bookmark[]
   sessions          Session[]
-
   @@map("users")
 }
-
 model Session {
   id        String   @id @default(cuid())
   userId    String
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@map("sessions")
 }
-
 model Idea {
   id          String      @id @default(cuid())
   title       String
@@ -62,7 +56,6 @@ model Idea {
   categoryId  String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-
   // Relations
   author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category    Category?   @relation(fields: [categoryId], references: [id])
@@ -71,10 +64,8 @@ model Idea {
   votes       Vote[]
   bookmarks   Bookmark[]
   reports     Report[]
-
   @@map("ideas")
 }
-
 model Category {
   id          String @id @default(cuid())
   name        String @unique
@@ -84,13 +75,10 @@ model Category {
   isActive    Boolean @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   // Relations
   ideas       Idea[]
-
   @@map("categories")
 }
-
 model Tag {
   id        String    @id @default(cuid())
   name      String    @unique
@@ -98,24 +86,18 @@ model Tag {
   useCount  Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
   // Relations
   ideas     IdeaTag[]
-
   @@map("tags")
 }
-
 model IdeaTag {
   ideaId String
   tagId  String
-
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
   @@id([ideaId, tagId])
   @@map("idea_tags")
 }
-
 model Comment {
   id        String   @id @default(cuid())
   content   String
@@ -124,60 +106,48 @@ model Comment {
   parentId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   // Relations
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   idea     Idea      @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies  Comment[] @relation("CommentReplies")
   reports  Report[]
-
   @@map("comments")
 }
-
 model Vote {
   id       String    @id @default(cuid())
   type     VoteType
   userId   String
   ideaId   String
   createdAt DateTime @default(now())
-
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
-
   @@unique([userId, ideaId])
   @@map("votes")
 }
-
 model Follow {
   id          String   @id @default(cuid())
   followerId  String
   followingId String
   createdAt   DateTime @default(now())
-
   // Relations
   follower  User @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
   following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
-
   @@unique([followerId, followingId])
   @@map("follows")
 }
-
 model Bookmark {
   id        String   @id @default(cuid())
   userId    String
   ideaId    String
   createdAt DateTime @default(now())
-
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
-
   @@unique([userId, ideaId])
   @@map("bookmarks")
 }
-
 model Subscription {
   id        String           @id @default(cuid())
   userId    String
@@ -190,13 +160,10 @@ model Subscription {
   stripeSubscriptionId String?
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@map("subscriptions")
 }
-
 model Notification {
   id        String           @id @default(cuid())
   userId    String
@@ -206,13 +173,10 @@ model Notification {
   data      Json?
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
-
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@map("notifications")
 }
-
 model Report {
   id        String     @id @default(cuid())
   type      ReportType
@@ -224,15 +188,12 @@ model Report {
   commentId String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-
   // Relations
   reporter User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
   idea     Idea?    @relation(fields: [ideaId], references: [id], onDelete: Cascade)
   comment  Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
   @@map("reports")
 }
-
 model MarketData {
   id          String   @id @default(cuid())
   symbol      String   @unique
@@ -242,10 +203,8 @@ model MarketData {
   volume24h   Float
   marketCap   Float
   lastUpdated DateTime @default(now())
-
   @@map("market_data")
 }
-
 model Event {
   id          String    @id @default(cuid())
   title       String
@@ -259,28 +218,23 @@ model Event {
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   @@map("events")
 }
-
 enum VoteType {
   UPVOTE
   DOWNVOTE
 }
-
 enum SubscriptionType {
   BASIC
   PRO
   ENTERPRISE
 }
-
 enum SubscriptionStatus {
   ACTIVE
   INACTIVE
   CANCELLED
   EXPIRED
 }
-
 enum NotificationType {
   IDEA_COMMENT
   IDEA_VOTE
@@ -289,7 +243,6 @@ enum NotificationType {
   SYSTEM
   PREMIUM_EXPIRY
 }
-
 enum ReportType {
   SPAM
   INAPPROPRIATE
@@ -297,7 +250,6 @@ enum ReportType {
   COPYRIGHT
   OTHER
 }
-
 enum ReportStatus {
   PENDING
   REVIEWED
